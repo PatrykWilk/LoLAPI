@@ -13,27 +13,40 @@
     <body>
     <?php
 
-	include 'APIKEY.php';
+	include('_include/APIKEY.inc');
 
     if(isset($_POST['Submit']))
 	{
 		$username = $_POST['Username'];
 		$usernameurl = rawurlencode($username);
-		//$api_key = 'RGAPI-7a232c6c-35cf-4d03-bc76-fd57d36dd5bf';
 		
         $curl = curl_init();
-        curl_setopt($curl, CURLOPT_URL, 'https://euw1.api.riotgames.com/lol/summoner/v3/summoners/by-name/' . $usernameurl . '?api_key=' . $api_key);
+		curl_setopt($curl, CURLOPT_URL, 'https://euw1.api.riotgames.com/lol/summoner/v3/summoners/by-name/' . $usernameurl . '?api_key=' . $api_key);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1); 
-        $result = curl_exec($curl);
+		$result = curl_exec($curl);
         $json = json_decode($result, true);
 		$summonerid = $json['accountId'];
 
-        curl_setopt($curl, CURLOPT_URL, 'https://euw1.api.riotgames.com/lol/match/v3/matchlists/by-account/' . $summonerid . '/recent?api_key=' . $api_key);
+        curl_setopt($curl, CURLOPT_URL, 'https://euw1.api.riotgames.com/lol/match/v3/matchlists/by-account/' . $summonerid . '?api_key=' . $api_key);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-        $results = curl_exec($curl);
+		$results = curl_exec($curl);
 		$matches = json_decode($results, true);
 		for($i=0;$i<5;$i++)
-		{			
+		{				
+			$champID[$i] = $matches['matches'][$i]['champion'];
+			echo $champID[$i];
+			$string = file_get_contents('_include/ChampList.json');
+			$content = json_decode($string, true);
+
+			foreach($content['data'] as $champs)
+			{
+				if($champs['id'] == $champID[$i])
+				{
+					$championName[$i] = $champs['name'];
+					$championTitle[$i] = $champs['title'];
+				}
+			}
+			
 			$matchid[$i] = $matches['matches'][$i]['gameId'];
 			curl_setopt($curl, CURLOPT_URL, 'https://euw1.api.riotgames.com/lol/match/v3/matches/' . $matchid[$i] . '?api_key=' . $api_key);
 			curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1); 
@@ -45,6 +58,7 @@
 				if ($matchTeam[$y] == $summonerid)
 				{
 					$teamID = $match['participantIdentities'][$y]['participantId'];
+					$teamposition = $y;
 				}
 			}
 			if ($teamID <= 5)
@@ -57,15 +71,42 @@
 			$matchResult[$i] = $match['teams'][$playerTeam]['win'];
 			if($matchResult[$i] == "Fail")
 			{
-				$matchResult[$i] = 'LOSE';
+				$matchResult[$i] = 'DEFEAT';
 			}
 			else if($matchResult[$i] == 'Win')
 			{
-				$matchResult[$i] = 'WIN';
+				$matchResult[$i] = 'VICTORY';
 			}
-		}
-		$curl = curl_close();
 
+			//TYPE of each of the game
+			$gametype[$i] = $match['queueId'];
+			if($gametype[$i] == 420)
+			{
+				$gamemode[$i] = "Ranked Solo Game";
+			} else 
+			{
+				$gamemode[$i] = "Normal Game";
+			}
+
+			//KILLS, DEATHS, ASSISTS for each of the games
+			$kills[$i] = $match['participants'][$teamposition]['stats']['kills']; 
+			$deaths[$i] = $match['participants'][$teamposition]['stats']['deaths'];
+			$assists[$i] = $match['participants'][$teamposition]['stats']['assists'];
+			$KDA[$i] = $kills[$i] . " / " . $deaths[$i] . " / " . $assists[$i];
+
+			//ITEMS for each of the games
+			$item0[$i] = $match['participants'][$teamposition]['stats']['item0'];
+			$item1[$i] = $match['participants'][$teamposition]['stats']['item1'];
+			$item2[$i] = $match['participants'][$teamposition]['stats']['item2'];
+			$item3[$i] = $match['participants'][$teamposition]['stats']['item3'];
+			$item4[$i] = $match['participants'][$teamposition]['stats']['item4'];
+			$item5[$i] = $match['participants'][$teamposition]['stats']['item5'];
+			$item6[$i] = $match['participants'][$teamposition]['stats']['item6'];
+
+		}
+
+
+		$curl = curl_close();
     }
     ?>
     <section class="jumbotron text-center">
@@ -88,14 +129,17 @@
 	if(isset($_POST['Submit']) and $_POST['Username'] != null)
 	{ ?>
 		<div class="container">
-			<div class="card">
+			<div class="card" style="width: 18rem;">
 				<div class="card-header">
-					<?php echo $matchResult[0];?>
+					<?php echo $gamemode[0] . " - " . $matchResult[0];?>
 				</div>
 				<div class="card-body">
-					<h5 class="card-title">Special Title</h5>
-					<p class="card-text">Insert text here</p>
-					<img src="https://ddragon.leagueoflegends.com/cdn/8.8.2/img/champion/<?php echo $champName[0]; ?>">
+					<h5 class="card-title">Special Title <?php echo $KDA[0]; ?></h5>
+					<p class="card-text">Insert text here<?php echo $championName[0] . " - " . $championTitle[0]; ?></p>
+					<img src="https://ddragon.leagueoflegends.com/cdn/8.9.1/img/champion/Ahri.png">
+					<img src="http://opgg-static.akamaized.net/images/lol/item/<?php echo $item0[0] . ".png"?>">
+					<img src="http://opgg-static.akamaized.net/images/lol/item/<?php echo $item1[0] . ".png"?>">
+					<img src="http://opgg-static.akamaized.net/images/lol/item/<?php echo $item2[0] . ".png"?>">
 					<a href="#" class="btn btn-primary">Go somewhere</a>
 				</div>
 			</div>
@@ -106,8 +150,8 @@
 					<?php echo $matchResult[1];?>
 				</div>
 				<div class="card-body">
-					<h5 class="card-title">Special Title</h5>
-					<p class="card-text">Insert text here</p>
+				<h5 class="card-title">Special Title <?php echo $KDA[1]; ?></h5>
+				<p class="card-text">Insert text here<?php echo $championName[1] . " - " . $championTitle[1]; ?></p>
 					<a href="#" class="btn btn-primary">Go somewhere</a>
 				</div>
 			</div>
@@ -118,7 +162,7 @@
 					<?php echo $matchResult[2];?>
 				</div>
 				<div class="card-body">
-					<h5 class="card-title">Special Title</h5>
+				<h5 class="card-title">Special Title <?php echo $KDA[2]; ?></h5>
 					<p class="card-text">Insert text here</p>
 					<a href="#" class="btn btn-primary">Go somewhere</a>
 				</div>
