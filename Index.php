@@ -31,10 +31,9 @@
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
 		$results = curl_exec($curl);
 		$matches = json_decode($results, true);
-		for($i=0;$i<5;$i++)
+		for($i=0;$i<6;$i++)
 		{				
 			$champID[$i] = $matches['matches'][$i]['champion'];
-			echo $champID[$i];
 			$string = file_get_contents('_include/ChampList.json');
 			$content = json_decode($string, true);
 
@@ -101,7 +100,18 @@
 			$item3[$i] = $match['participants'][$teamposition]['stats']['item3'];
 			$item4[$i] = $match['participants'][$teamposition]['stats']['item4'];
 			$item5[$i] = $match['participants'][$teamposition]['stats']['item5'];
-			$item6[$i] = $match['participants'][$teamposition]['stats']['item6'];
+
+			//CHECK if empty
+			for($w=0;$w<6;$w++)
+			{
+				if(${'item' . $w}[$i] == 0)
+				{
+					${'item' . $w}[$i] = "img/noitem.png";
+				} else 
+				{
+					${'item' . $w}[$i] = "http://opgg-static.akamaized.net/images/lol/item/" . ${'item' . $w}[$i] . ".png";
+				}
+			}
 
 		}
 
@@ -128,70 +138,40 @@
 	<?php
 	if(isset($_POST['Submit']) and $_POST['Username'] != null)
 	{ ?>
-		<div class="container">
-			<div class="card" style="width: 18rem;">
-				<div class="card-header">
-					<?php echo $gamemode[0] . " - " . $matchResult[0];?>
+	<div class="container">
+		<div class="card-group">
+			<?php for($i=0;$i<3;$i++){?>
+				<div class="card mb-3">
+					<img class="card-img-top" src="https://ddragon.leagueoflegends.com/cdn/img/champion/splash/<?php echo $championName[$i];?>_0.jpg">
+					<div class="card-body text-center">
+						<h2 class="card-title mb-0 text-primary"><?php echo $championName[$i];?></h2>
+						<p class="card-text font-italic"><?php echo $championTitle[$i];?></p>
+						<div class="row d-block">
+							<img src="<?php echo $item0[$i]?>"><img src="<?php echo $item1[$i]?>"><img src="<?php echo $item2[$i]?>">
+						</div>
+						<div class="row d-block">
+							<img src="<?php echo $item3[$i]?>"><img src="<?php echo $item4[$i]?>"><img src="<?php echo $item5[$i]?>">
+						</div>
+						<h1 class="mt-3"><?php echo $KDA[$i];?></h1>
+					</div>
+					<div class="card-footer"><?php echo $gamemode[$i] . " - " . $matchResult[$i];?></div>
 				</div>
-				<div class="card-body">
-					<h5 class="card-title">Special Title <?php echo $KDA[0]; ?></h5>
-					<p class="card-text">Insert text here<?php echo $championName[0] . " - " . $championTitle[0]; ?></p>
-					<img src="https://ddragon.leagueoflegends.com/cdn/8.9.1/img/champion/Ahri.png">
-					<img src="http://opgg-static.akamaized.net/images/lol/item/<?php echo $item0[0] . ".png"?>">
-					<img src="http://opgg-static.akamaized.net/images/lol/item/<?php echo $item1[0] . ".png"?>">
-					<img src="http://opgg-static.akamaized.net/images/lol/item/<?php echo $item2[0] . ".png"?>">
-					<a href="#" class="btn btn-primary">Go somewhere</a>
-				</div>
-			</div>
+			<?php }?>
 		</div>
-		<div class="container">
-			<div class="card">
-				<div class="card-header">
-					<?php echo $matchResult[1];?>
+		<div class="card-group">
+			<?php for($i=3;$i<6;$i++){?>
+				<div class="card">
+					<img class="card-img-top" src="https://ddragon.leagueoflegends.com/cdn/img/champion/splash/<?php echo $championName[$i];?>_0.jpg">
+					<div class="card-body">
+						<h5 class="card-title"><?php echo $championName[$i];?></h5>
+						<p class="card-text"><?php echo $championTitle[$i];?></p>
+
+					</div>
 				</div>
-				<div class="card-body">
-				<h5 class="card-title">Special Title <?php echo $KDA[1]; ?></h5>
-				<p class="card-text">Insert text here<?php echo $championName[1] . " - " . $championTitle[1]; ?></p>
-					<a href="#" class="btn btn-primary">Go somewhere</a>
-				</div>
-			</div>
+			<?php }?>
 		</div>
-		<div class="container">
-			<div class="card">
-				<div class="card-header">
-					<?php echo $matchResult[2];?>
-				</div>
-				<div class="card-body">
-				<h5 class="card-title">Special Title <?php echo $KDA[2]; ?></h5>
-					<p class="card-text">Insert text here</p>
-					<a href="#" class="btn btn-primary">Go somewhere</a>
-				</div>
-			</div>
-		</div>
-		<div class="container">
-			<div class="card">
-				<div class="card-header">
-					<?php echo $matchResult[3];?>
-				</div>
-				<div class="card-body">
-					<h5 class="card-title">Special Title</h5>
-					<p class="card-text">Insert text here</p>
-					<a href="#" class="btn btn-primary">Go somewhere</a>
-				</div>
-			</div>
-		</div>
-		<div class="container">
-			<div class="card">
-				<div class="card-header">
-					<?php echo $matchResult[4];?>
-				</div>
-				<div class="card-body">
-					<h5 class="card-title">Special Title</h5>
-					<p class="card-text">Insert text here</p>
-					<a href="#" class="btn btn-primary">Go somewhere</a>
-				</div>
-			</div>
-		</div>
+	</div>
+		
 	<?php } ?>
 	
     </body>
