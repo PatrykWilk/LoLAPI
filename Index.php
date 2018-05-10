@@ -13,11 +13,13 @@
     <body>
     <?php
 
+	include 'APIKEY.php';
+
     if(isset($_POST['Submit']))
 	{
 		$username = $_POST['Username'];
 		$usernameurl = rawurlencode($username);
-		$api_key = 'RGAPI-68fcf9f5-b203-48ca-bf96-5f4755edc4e4';
+		//$api_key = 'RGAPI-7a232c6c-35cf-4d03-bc76-fd57d36dd5bf';
 		
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_URL, 'https://euw1.api.riotgames.com/lol/summoner/v3/summoners/by-name/' . $usernameurl . '?api_key=' . $api_key);
@@ -29,9 +31,9 @@
         curl_setopt($curl, CURLOPT_URL, 'https://euw1.api.riotgames.com/lol/match/v3/matchlists/by-account/' . $summonerid . '/recent?api_key=' . $api_key);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
         $results = curl_exec($curl);
-        $matches = json_decode($results, true);
+		$matches = json_decode($results, true);
 		for($i=0;$i<5;$i++)
-		{
+		{			
 			$matchid[$i] = $matches['matches'][$i]['gameId'];
 			curl_setopt($curl, CURLOPT_URL, 'https://euw1.api.riotgames.com/lol/match/v3/matches/' . $matchid[$i] . '?api_key=' . $api_key);
 			curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1); 
@@ -93,6 +95,7 @@
 				<div class="card-body">
 					<h5 class="card-title">Special Title</h5>
 					<p class="card-text">Insert text here</p>
+					<img src="https://ddragon.leagueoflegends.com/cdn/8.8.2/img/champion/<?php echo $champName[0]; ?>">
 					<a href="#" class="btn btn-primary">Go somewhere</a>
 				</div>
 			</div>
