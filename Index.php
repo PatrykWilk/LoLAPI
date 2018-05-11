@@ -14,6 +14,7 @@
     <?php
 
 	include('_include/APIKEY.inc');
+	include('_include/dbconnection.inc');
 
     if(isset($_POST['Submit']))
 	{
@@ -113,6 +114,12 @@
 				}
 			}
 
+		}
+
+		if($summonerid != null)
+		{
+			$sql = "INSERT INTO LoLAPI (Username,Game1,Game2,Game3,Game4,Game5,Game6) values ('$username','$matchResult[0]','$matchResult[1]','$matchResult[2]','$matchResult[3]','$matchResult[4]','$matchResult[5]');";
+			$result = mysqli_query($conn,$sql);
 		}
 
 
