@@ -41,7 +41,7 @@
 			{
 				if($champs['id'] == $champID[$i])
 				{
-					$championName[$i] = $champs['name'];
+					$championName[$i] = $champs['key'];
 					$championTitle[$i] = $champs['title'];
 				}
 			}
@@ -119,7 +119,7 @@
 		$curl = curl_close();
     }
     ?>
-    <section class="jumbotron text-center">
+    <section class="jumbotron text-center pb-4">
 	    <div class="container">
 			<h1 class="jumbotron-heading">League of Legends API</h1>
 			<p class="lead text-muted">Search through your past matches on the League of Legends EU WEST servers by inserting your in-game name below.</p>
@@ -135,8 +135,12 @@
 			</form>
 		</div>
     </section>
+	<?php if(isset($_POST['Submit']) and $_POST['Username'] != null and $summonerid == null){?>
+		<div class="alert alert-danger w-25 mx-auto text-center" role="alert">
+			<strong>Oh snap!</strong> <?php echo strtoupper($username);?> doesn't seem to exist.
+		</div><?php }?>
 	<?php
-	if(isset($_POST['Submit']) and $_POST['Username'] != null)
+	if(isset($_POST['Submit']) and $_POST['Username'] != null and $summonerid != null)
 	{ ?>
 	<div class="container">
 		<div class="card-group">
@@ -154,24 +158,29 @@
 						</div>
 						<h1 class="mt-3"><?php echo $KDA[$i];?></h1>
 					</div>
-					<div class="card-footer"><?php echo $gamemode[$i] . " - " . $matchResult[$i];?></div>
+					<div class="card-footer text-center font-weight-bold <?php if($matchResult[$i] == 'VICTORY'){echo 'bg-success';} else {echo 'bg-danger';}?>"><?php echo $gamemode[$i] . " - " . $matchResult[$i];?></div>
 				</div>
 			<?php }?>
 		</div>
 		<div class="card-group">
 			<?php for($i=3;$i<6;$i++){?>
-				<div class="card">
+				<div class="card mb-3">
 					<img class="card-img-top" src="https://ddragon.leagueoflegends.com/cdn/img/champion/splash/<?php echo $championName[$i];?>_0.jpg">
-					<div class="card-body">
-						<h5 class="card-title"><?php echo $championName[$i];?></h5>
-						<p class="card-text"><?php echo $championTitle[$i];?></p>
-
+					<div class="card-body text-center">
+						<h2 class="card-title mb-0 text-primary"><?php echo $championName[$i];?></h2>
+						<p class="card-text font-italic"><?php echo $championTitle[$i];?></p>
+						<div class="row d-block">
+							<img src="<?php echo $item0[$i]?>"><img src="<?php echo $item1[$i]?>"><img src="<?php echo $item2[$i]?>">
+						</div>
+						<div class="row d-block">
+							<img src="<?php echo $item3[$i]?>"><img src="<?php echo $item4[$i]?>"><img src="<?php echo $item5[$i]?>">
+						</div>
+						<h1 class="mt-3"><?php echo $KDA[$i];?></h1>
 					</div>
+					<div class="card-footer text-center font-weight-bold <?php if($matchResult[$i] == 'VICTORY'){echo 'bg-success';} else {echo 'bg-danger';}?>"><?php echo $gamemode[$i] . " - " . $matchResult[$i];?></div>
 				</div>
 			<?php }?>
-		</div>
-	</div>
-		
+		</div>		
 	<?php } ?>
 	
     </body>
