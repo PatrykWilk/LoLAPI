@@ -20,6 +20,8 @@
 	{
 		$username = $_POST['Username'];
 		$usernameurl = rawurlencode($username);
+		$wins = 0;
+		$loses = 0;
 		
         $curl = curl_init();
 		curl_setopt($curl, CURLOPT_URL, 'https://euw1.api.riotgames.com/lol/summoner/v3/summoners/by-name/' . $usernameurl . '?api_key=' . $api_key);
@@ -72,10 +74,12 @@
 			if($matchResult[$i] == "Fail")
 			{
 				$matchResult[$i] = 'DEFEAT';
+				$loses += 1;
 			}
 			else if($matchResult[$i] == 'Win')
 			{
 				$matchResult[$i] = 'VICTORY';
+				$wins += 1;
 			}
 
 			//TYPE of each of the game
@@ -145,6 +149,11 @@
 	<?php if(isset($_POST['Submit']) and $_POST['Username'] != null and $summonerid == null){?>
 		<div class="alert alert-danger w-25 mx-auto text-center" role="alert">
 			<strong>Oh snap!</strong> <?php echo strtoupper($username);?> doesn't seem to exist.
+		</div><?php }?>
+
+	<?php if(isset($_POST['Submit']) and $_POST['Username'] != null and $summonerid != null){?>
+		<div class="alert alert-info w-50 mx-auto text-center" role="alert">
+			<strong>You have won <?php echo $wins;?> games and lost <?php echo $loses;?> games. That's <?php $ratio = 100/6*$wins; echo(round($ratio));?>% win ratio!</strong>
 		</div><?php }?>
 	<?php
 	if(isset($_POST['Submit']) and $_POST['Username'] != null and $summonerid != null)
