@@ -1,0 +1,5 @@
+<IfModule mod_rewrite.c>
+RewriteEngine On # Turn on the rewriting engine
+RewriteRule ^Players/?$ Players.php [NC,L]
+RewriteRule ^Players/([0-9]+)/?$ Players.php?id=$1 [NC,L]
+</IfModule>
