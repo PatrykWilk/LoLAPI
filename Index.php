@@ -122,7 +122,8 @@
 
 		if($summonerid != null)
 		{
-			$sql = "INSERT INTO LoLAPI (Username,Game1,Game2,Game3,Game4,Game5,Game6) values ('$username','$matchResult[0]','$matchResult[1]','$matchResult[2]','$matchResult[3]','$matchResult[4]','$matchResult[5]');";
+			$ratio = 100/6*$wins;
+			$sql = "INSERT INTO Players (Username,Game1,Game2,Game3,Game4,Game5,Game6,WinRatio) values ('$username','$matchResult[0]','$matchResult[1]','$matchResult[2]','$matchResult[3]','$matchResult[4]','$matchResult[5]',round('$ratio'));";
 			$result = mysqli_query($conn,$sql);
 		}
 
@@ -153,7 +154,7 @@
 
 	<?php if(isset($_POST['Submit']) and $_POST['Username'] != null and $summonerid != null){?>
 		<div class="alert alert-info w-50 mx-auto text-center" role="alert">
-			<strong>You have won <?php echo $wins;?> games and lost <?php echo $loses;?> games. That's <?php $ratio = 100/6*$wins; echo(round($ratio));?>% win ratio!</strong>
+			<strong>You have won <?php echo $wins;?> games and lost <?php echo $loses;?> games. That's <?php echo(round($ratio));?>% win ratio!</strong>
 		</div><?php }?>
 	<?php
 	if(isset($_POST['Submit']) and $_POST['Username'] != null and $summonerid != null)
